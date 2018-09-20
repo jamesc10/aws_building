@@ -38,9 +38,9 @@
 
     var  dataCdata = obj[0]; //
 var
-    featAcolor = ['#00BFFF', '#00BFFF', '#cc0000'],
-    featBcolor = ['#00BFFF', '#00BFFF', '#cc0000'],
-    featCcolor = ['#00BFFF', '#00BFFF', '#cc0000']; // feature, fill, click
+    featAcolor = ['#00BFFF', '#00BFFF', '#cc0000'];
+    // featBcolor = ['#00BFFF', '#00BFFF', '#cc0000'],
+    // featCcolor = ['#00BFFF', '#00BFFF', '#cc0000']; // feature, fill, click
 
 
       // parse dataCdata features into separate layers based on type
