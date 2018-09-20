@@ -1,0 +1,13 @@
+/* place holder for custom CSS rules */
+
+body {
+  font-family: "Work Sans", sans-sans-serif;
+}
+
+.leaflet-Tooltip {
+  font-size: 400%;
+}
+
+.leaflet-Popup {
+  font-size: 500%;
+}
