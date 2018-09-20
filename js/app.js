@@ -4,7 +4,7 @@
     // zoomSnap: .2,
     center: [37.6907, -85.8647],
     zoom: 23,
-    minZoom: 18,
+    minZoom: 20,
     maxZoom: 23,
     wheelPxPerZoomLevel: 20000,
     wheelDebounceTime: 1500,
@@ -24,10 +24,10 @@
   var markLayer = L.featureGroup().addTo(map);
 
   // request the contour & pile data geoJson
-  var dataCjson = d3.json("data/features.geojson"); //set 1
+  var dataCjson = d3.json("data/features-gj.geojson"); //set 1
 
   // text for display notes
-  var noteC = "Fast 1ft Contours";
+  var noteC = "Feature information";
 
   // wait until all data loaded
   Promise.all([dataCjson]).then(drawData);
@@ -36,7 +36,7 @@
   // create layers and add contours to map
   function drawData(obj) {
 
-    var  dataCdata = obj[2]; //
+    var  dataCdata = obj[0]; //
 var
     featAcolor = ['#00BFFF', '#00BFFF', '#cc0000'],
     featBcolor = ['#00BFFF', '#00BFFF', '#cc0000'],
@@ -46,11 +46,7 @@ var
       // parse dataCdata features into separate layers based on type
     // features - buildings
     var buildingLayer = L.geoJson(dataCdata, {
-      filter: function(feature) {
-        if (feature.properties.type == 'building') {
-          return feature;
-        }
-      },
+
       style: function(feature) {
         return {
           color: featAcolor[0],
@@ -68,8 +64,8 @@ var
           layer.setStyle({
             fillColor: featAcolor[2]
           });
-          var toolTip = "<b>" + props.name +
-            "<br>" + props.info +
+          var toolTip = "<b>" + props.Name +
+            "<br>" + props.Info +
             "</b>";
 
           // layer.bindTooltip(toolTip);
@@ -94,68 +90,14 @@ var
           });
 
           // update data panel
-          d3.select('.name span').html(props.name);
-          d3.select('.data span').html(props.info);
+          d3.select('.name span').html(props.Name);
+          d3.select('.data span').html(props.Info);
         })
       }
     });
 
 
     // features - land labeled sport
-    var landLayer = L.geoJson(dataCdata, {
-      filter: function(feature) {
-        if (feature.properties.type == 'sport') {
-          return feature;
-        }
-      },
-
-      style: function(feature) {
-        return {
-          color: featBcolor[0],
-          weight: 2,
-          fillColor: featBcolor[1]
-        }
-      },
-      onEachFeature: function(feature, layer) {
-
-        var props = feature.properties
-
-        layer.on('mouseover', function() {
-          // change layer style
-          layer.setStyle({
-            fillColor: featBcolor[2]
-          });
-          var toolTip = "<b>" + props.name +
-            "<br>" + props.info +
-            "</b>";
-
-          // layer.bindTooltip(toolTip);
-          layer.bindTooltip(toolTip);
-        });
-
-        layer.on('mouseout', function() {
-          // reset style
-          layer.setStyle({
-            fillColor: featBcolor[1],
-          })
-        });
-
-        layer.on('click', function() {
-          // reset style of all footprints prior to next choice
-          resetFeatures();
-
-          // change clicked pile style
-          layer.setStyle({
-            color: featBcolor[2],
-            weight: 3
-          });
-
-          // update data panel
-          d3.select('.name span').html(props.name);
-          d3.select('.data span').html(props.info);
-        })
-      }
-    });
 
     function resetFeatures() {
 
@@ -163,22 +105,19 @@ var
         color: featAcolor[0],
         weight: 2
       });
-      landLayer.setStyle({
-        color: featBcolor[0],
-        weight: 2
-      });
+
 
     }
 
-    buttonsUi(buildingLayer, landLayer);
+    buttonsUi(buildingLayer);
 
   } // end drawData
 
   // toggle butttons to choose layers
-  function buttonsUi(buildingLayer, landLayer) {
+  function buttonsUi(buildingLayer) {
 
     // var project1 = true; // disabled with one base
-    var dataSet1 = false;
+    // var dataSet1 = false;
     var features = false;
     var base = false;
     var measure = false;
@@ -193,33 +132,17 @@ var
 
       // select data sets
       if (selected === 'toggle-set1') {
-        dataSet1 = true;
-        contourA = false;
-        base = false;
-        clearResults();
-        updateLayers();
-        d3.select('.note span').html(noteA);
+        features = true;
 
-      } else if (selected === 'toggle-set2') {
-        dataSet1 = false;
-        contourA = false;
-        base = false;
-        clearResults();
-        updateLayers();
-        d3.select('.note span').html(noteB);
-
-      } else if (selected === 'toggle-set3') {
-        dataSet1 = false;
-        contourA = true;
         base = false;
         clearResults();
         updateLayers();
         d3.select('.note span').html(noteC);
 
-      } else if (selected === 'toggle-base') {
+      }  else if (selected === 'toggle-base') {
         base = true;
-        dataSet1 = false;
-        contourA = false;
+        features = false;
+
         clearResults();
         updateLayers();
         d3.select('.note span').html("Base photo only");
@@ -245,24 +168,14 @@ var
 
     // add layer to dispay and remove all others
     function updateLayers() {
-      if (dataSet1 == true && contourA == false && base == false) {
+      if (features == true &&  base == false) {
 
         map.addLayer(buildingLayer);
-        map.addLayer(landLayer);
 
-      } else if (dataSet1 == false && contourA == false && base == false) {
 
+      }  else if (base == true) {
         map.removeLayer(buildingLayer);
-        map.removeLayer(landLayer);
 
-      } else if (dataSet1 == false && contourA == true && base == false) {
-        map.removeLayer(buildingLayer);
-        map.removeLayer(landLayer);
-
-
-      } else if (base == true) {
-        map.removeLayer(buildingLayer);
-        map.removeLayer(landLayer);
 
       }
     } //end updateLayers
